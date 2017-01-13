@@ -10,7 +10,11 @@
      <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 注册服务
 
-    <service android:name="com.bobo.recorder.RecordService"/>
+    <service android:name="com.bobo.recorder.RecordService">
+            <intent-filter>
+                <action android:name="com.bobo.recorder"/>
+            </intent-filter>
+    </service>
 ## 使用##
 ### 1.Activity中获取Recorder实例，并完成初始化 ###
     private Recorder mRecorder;
