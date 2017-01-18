@@ -1,6 +1,6 @@
 # Android Screen Recorder SDK #
 
-基于Android 5.0 API21，录制暂停、继续功能需要在API24及以上使用，5.0以下版本可以调用，但是无效，使用时不必区分版本
+基于Android 5.0 API21录屏SDK，适用于API21及以上版本，API21以下版本可以调用但是无效，使用时不必区分版本
 
 ## AndroidManifest.xml 配置 ##
 
@@ -17,17 +17,33 @@
     </service>
 ## 使用##
 ### 1.Activity中获取Recorder实例，并完成初始化 ###
+	
     private Recorder mRecorder;
     mRecorder = Recorder.getRecorder();
     mRecorder.init(this);
+
+	/*以下设置可选，不设置时为默认值*/
+
+	//设置帧率，默认30
+ 	mRecorder.setVideoFrameRate(15);
+	//设置视频宽高，默认设备原始宽高
+    mRecorder.setVideoSize(500,600);
+	//设置编码比特率，默认5 * 1024 * 1024
+    mRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
+	//设置视频输出完整路径（含文件名，文件名以".mp4"结尾）,默认SD卡根目录/ScreenRecord/“时间戳".mp4
+    mRecorder.setOutputFile(Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator++System.currentTimeMillis()+".mp4");
 ### 2.配置相关回调 ###
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         mRecorder.onActivityResult(requestCode, resultCode, data);
     }
 	@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] 	grantResults) {
-		mRecorder.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(! mRecorder.onRequestPermissionsResult(requestCode,permissions,grantResults)){
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            //TODO：SD卡读写&麦克风权限申请失败的处理方法
+            Toast.makeText(this, "未获取麦克风或SD卡读取权限", Toast.LENGTH_SHORT).show();
+        }
     }
 	@Override
     protected void onDestroy() 
@@ -41,10 +57,9 @@
     mRecorder.start();
 	//录制结束
     mRecorder.stop();
-	//其他方法陆续开放中
-	...
+
 ### 4.视频位置 ###
-执行stop()方法后，视频文件（.mp4）默认存放在SD卡根目录"ScreenRecord"文件中，自定义位置方法正在开放中...
+执行stop()方法后，视频文件（.mp4）默认存放在SD卡根目录"ScreenRecord"文件中
 ## 调用SDK实例 ##
     public class MainActivity extends AppCompatActivity {
     
@@ -60,6 +75,12 @@
         	mRecorder = Recorder.getRecorder();
 			//传入当前Activity实例，完成初始化
         	mRecorder.init(this);
+			//设置帧率，不设置为默认值30
+			mRecorder.setVideoFrameRate(15);
+			//设置视频宽高，不设置为设备原始宽高
+        	mRecorder.setVideoSize(500,600);
+			//设置视频输出完整路径（含文件名，文件名以".mp4"结尾）,不设置默认SD卡根目录/ScreenRecord/“时间戳".mp4
+			mRecorder.setOutputFile(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+System.currentTimeMillis()+".mp4");
 
         	btn = (Button) findViewById(R.id.start_record);
         	btn.setOnClickListener(new View.OnClickListener() {
@@ -83,11 +104,14 @@
     	}
 
     	@Override
-    	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] 	grantResults) {
-			//设置回调
-        	mRecorder.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    	}
+   		public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        	if(! mRecorder.onRequestPermissionsResult(requestCode,permissions,grantResults)){
+            	super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+           		//TODO：SD卡读写&麦克风权限申请失败的处理方法
+            	Toast.makeText(this, "未获取麦克风或SD卡读取权限", Toast.LENGTH_SHORT).show();
+        }
 
+    }
    		@Override
     	protected void onDestroy() {
 			//结束释放
