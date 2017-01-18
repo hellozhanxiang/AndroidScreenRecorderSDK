@@ -107,8 +107,8 @@
    		public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         	if(! mRecorder.onRequestPermissionsResult(requestCode,permissions,grantResults)){
             	super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-           		//TODO：SD卡读写&麦克风权限申请失败的处理方法
-            	Toast.makeText(this, "未获取麦克风或SD卡读取权限", Toast.LENGTH_SHORT).show();
+           		//TODO：SD卡写入&麦克风权限申请失败的处理方法
+            	Toast.makeText(this, "未获取麦克风或SD卡写入权限", Toast.LENGTH_SHORT).show();
         }
 
     }
